@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Email Sending (SMTP){% endblock %}
+{% block header %}Email Sending (SMTP){% endblock %}
+{% block content %}
+<div class="max-w-6xl space-y-6">
+  <div class="rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 p-4 text-sm text-blue-800 dark:text-blue-200">
+    Configure the SMTP relay used to deliver authorized security-awareness simulation emails. SMTP passwords are encrypted before storage and are never displayed again.
+  </div>
+  <div class="grid lg:grid-cols-[1fr_360px] gap-6 items-start">
+    <section class="space-y-4">
+      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Sender Profiles</h2>
+      {% for p in profiles %}
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="font-semibold">{{ p.name }}</h3>
+            <p class="text-sm text-slate-500 mt-1">{{ p.from_name }} &lt;{{ p.from_email }}&gt;</p>
+            <p class="font-mono text-xs text-slate-400 mt-2">{{ p.smtp_host }}:{{ p.smtp_port }} · TLS: {{ 'on' if p.smtp_use_tls else 'off' }}</p>
+          </div>
+          <span class="badge {% if p.is_active %}bg-emerald-100 text-emerald-700{% else %}bg-slate-100 text-slate-500{% endif %}">{{ 'Active' if p.is_active else 'Inactive' }}</span>
+        </div>
+        <div class="flex gap-4 mt-4 text-sm">
+          <form method="post" action="/settings/email/{{ p.id }}/toggle">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="text-blue-600 hover:underline" type="submit">{{ 'Deactivate' if p.is_active else 'Activate' }}</button>
+          </form>
+          <span class="text-slate-400">SMTP password is hidden after save</span>
+        </div>
+      </div>
+      {% else %}
+      <div class="bg-white dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center text-slate-500">No SMTP sender profiles configured.</div>
+      {% endfor %}
+    </section>
+    <section class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+      <h2 class="font-semibold mb-4">Add Sender Profile</h2>
+      <form method="post" action="/settings/email/add" class="space-y-3">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div>
+          <label class="block text-xs font-medium text-slate-500 mb-1">Provider</label>
+          <select id="provider" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm" onchange="applyProvider(this.value)">
+            <option value="custom">Custom / Other</option>
+            <option value="gmail">Gmail / Google Workspace</option>
+            <option value="m365">Microsoft 365</option>
+            <option value="sendgrid">SendGrid</option>
+            <option value="ses">Amazon SES</option>
+            <option value="mailgun">Mailgun</option>
+          </select>
+        </div>
+        <input name="name" placeholder="Profile Name" required class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <input name="from_name" placeholder="From Name" required class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <input name="from_email" type="email" placeholder="From Email" required class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <input name="reply_to" type="email" placeholder="Reply-To (optional)" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <div class="grid grid-cols-[1fr_90px] gap-2">
+          <input id="smtp_host" name="smtp_host" placeholder="SMTP Host" required class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+          <input id="smtp_port" name="smtp_port" type="number" value="587" min="1" max="65535" required class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        </div>
+        <label class="flex items-center gap-2 text-sm"><input id="smtp_tls" type="checkbox" name="smtp_use_tls" checked> STARTTLS/TLS</label>
+        <input name="smtp_username" placeholder="SMTP Username" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <input name="smtp_password" type="password" placeholder="SMTP Password / App Password" class="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <button type="submit" class="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-4 py-2">Save Sender Profile</button>
+      </form>
+    </section>
+  </div>
+</div>
+<script>
+function applyProvider(v) {
+  const presets = {
+    gmail: ['smtp.gmail.com', 587, true],
+    m365: ['smtp.office365.com', 587, true],
+    sendgrid: ['smtp.sendgrid.net', 587, true],
+    ses: ['email-smtp.us-east-1.amazonaws.com', 587, true],
+    mailgun: ['smtp.mailgun.org', 587, true],
+    custom: ['', 587, true]
+  };
+  const p = presets[v] || presets.custom;
+  document.getElementById('smtp_host').value = p[0];
+  document.getElementById('smtp_port').value = p[1];
+  document.getElementById('smtp_tls').checked = p[2];
+}
+</script>
+{% endblock %}
