@@ -1,15 +1,42 @@
 # PhishSim
 
-PhishSim is a security-awareness and authorized phishing-simulation platform built with FastAPI and PostgreSQL.
+PhishSim is an authorized security-awareness and phishing-simulation platform built around FastAPI, PostgreSQL, database migrations, and RHEL-friendly deployment scripts.
 
-## Repository
+> **Authorized use only.** Run simulations only against systems, domains, mailboxes, and recipients for which you have explicit permission.
 
-This repository contains the application source, database migrations, deployment scripts, and example configuration.
+## Repository layout
 
-## Security
+```text
+backend/        FastAPI application, models, services, web routes, migrations
+frontend/       Frontend/template assets included by the source package
+scripts/        Bootstrap, server, and systemd deployment helpers
+tests/          Automated tests
+docker/         Container/deployment assets
+.env.example    Safe configuration template
+```
 
-Use this platform only for authorized security-awareness exercises and controlled internal testing. Do not commit credentials, secrets, production `.env` files, private keys, or recipient data.
+## Clone and run
 
-## RHEL 9
+```bash
+git clone https://github.com/resanul/phishsim.git
+cd phishsim
+cp .env.example .env
+./scripts/bootstrap.sh --no-serve
+./scripts/run_server.sh
+```
 
-Deployment helpers are provided under `scripts/` for RHEL-family systems. Review and harden the environment before production use, including HTTPS, a dedicated service account, MFA, PostgreSQL access controls, and firewall policy.
+The default development bind is `0.0.0.0:9988`; review `.env` and firewall policy before exposing it beyond a trusted network.
+
+## Update after a Git push
+
+```bash
+git pull --ff-only
+./scripts/bootstrap.sh --no-serve
+sudo systemctl restart phishsim
+```
+
+## Security hygiene
+
+- Never commit `.env`, credentials, private keys, tokens, or real recipient datasets.
+- Keep `.env.example` free of real secrets.
+- Use this project only for controlled, authorized awareness exercises.
