@@ -1,0 +1,2 @@
+PhishSim platform source sync manifest
+Prepared from validated phishsim_platform bundle.
