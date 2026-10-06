@@ -25,6 +25,9 @@ if [[ -f "$ENV_FILE" ]]; then
 fi
 
 install -D -m 0644 "$REPO_DIR/backend/app/web/templates/base.html" "$APP_DIR/backend/app/web/templates/base.html"
+install -D -m 0644 "$REPO_DIR/backend/app/main.py" "$APP_DIR/backend/app/main.py"
+install -D -m 0644 "$REPO_DIR/backend/app/web/routes/email_web.py" "$APP_DIR/backend/app/web/routes/email_web.py"
+install -D -m 0644 "$REPO_DIR/backend/app/web/templates/settings/email.html" "$APP_DIR/backend/app/web/templates/settings/email.html"
 
 if [[ -x "$APP_DIR/.venv/bin/python" ]]; then
   log "Installing Python dependencies..."
