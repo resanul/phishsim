@@ -40,15 +40,30 @@ fi
 
 log "Restarting only phishsim.service..."
 systemctl restart phishsim
-sleep 2
-systemctl is-active --quiet phishsim || die "phishsim.service failed to start"
 
 APP_PORT="$(awk -F= '$1=="APP_PORT" {print $2}' "$ENV_FILE" 2>/dev/null | tail -1)"
 APP_PORT="${APP_PORT:-9988}"
-log "Checking health endpoint on port $APP_PORT..."
-curl -fsS --max-time 10 "http://127.0.0.1:${APP_PORT}/health" >/dev/null || {
+log "Waiting for phishsim.service to become active..."
+for i in {1..15}; do
+  if systemctl is-active --quiet phishsim; then
+    break
+  fi
+  sleep 2
+done
+systemctl is-active --quiet phishsim || {
   journalctl -u phishsim -n 80 --no-pager
-  die "Health check failed"
+  die "phishsim.service failed to start"
 }
 
-log "Update complete. phishsim.service is healthy."
+log "Waiting for TCP port $APP_PORT..."
+for i in {1..15}; do
+  if (echo >/dev/tcp/127.0.0.1/"$APP_PORT") >/dev/null 2>&1; then
+    log "PhishSim is listening on port $APP_PORT."
+    log "Update complete. phishsim.service is healthy."
+    exit 0
+  fi
+  sleep 2
+done
+
+journalctl -u phishsim -n 80 --no-pager
+die "PhishSim did not become reachable on port $APP_PORT."
