@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Landing Pages{% endblock %}
+{% block header %}Landing Pages{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+  <p class="text-sm text-slate-400">{{ items|length }} landing page(s)</p>
+  <a href="/landing-pages/new" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2">+ New Landing Page</a>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+  {% for p in items %}
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+    <iframe srcdoc="{{ p.html_body|e }}" class="w-full h-40 border-0 bg-white" sandbox=""></iframe>
+    <div class="p-4">
+      <h3 class="font-semibold text-sm mb-1">{{ p.name }}</h3>
+      <div class="flex gap-2">
+        {% if p.has_synthetic_form %}<span class="badge bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">Synthetic Form</span>{% endif %}
+        {% if p.show_education_reveal %}<span class="badge bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">Education Reveal</span>{% endif %}
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-slate-400 col-span-full text-center py-8">No landing pages yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}New Campaign{% endblock %}
+{% block header %}New Campaign{% endblock %}
+{% block content %}
+<form method="post" action="/campaigns/new" class="max-w-3xl space-y-6">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">1. Basics</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="md:col-span-2">
+        <label class="block text-xs font-medium text-slate-400 mb-1">Campaign Name</label>
+        <input name="name" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-medium text-slate-400 mb-1">Description</label>
+        <textarea name="description" rows="2" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm"></textarea>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-medium text-slate-400 mb-1">Objective</label>
+        <input name="objective" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">2. Content</h2>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Email Template</label>
+        <select name="template_id" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+          {% for t in templates_ %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Landing Page</label>
+        <select name="landing_page_id" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+          {% for p in landing_pages %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Sender Profile</label>
+        <select name="sender_profile_id" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+          {% for s in senders %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+    {% if not templates_ or not landing_pages or not senders %}
+    <p class="text-xs text-amber-600 mt-3">You need at least one template, landing page, and sender profile before creating a campaign. Run <code>python manage.py seed-demo</code> or create them under Templates / Landing Pages.</p>
+    {% endif %}
+  </div>
+
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">3. Targeting</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Target Departments (comma separated, blank = everyone)</label>
+        <input name="departments" placeholder="Engineering, Finance" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Recipient Groups</label>
+        <select name="group_ids" multiple class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm h-20">
+          {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">4. Authorization &amp; Safety</h2>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Authorized Organization</label>
+        <input name="authorized_organization" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Approved Recipient Domains</label>
+        <input name="approved_domains" placeholder="example.org, corp.example.org" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-medium text-slate-400 mb-1">Campaign Purpose (required for audit)</label>
+        <textarea name="campaign_purpose" required rows="2" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm"></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Sending Rate (per minute)</label>
+        <input type="number" name="sending_rate_per_minute" value="10" min="1" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div class="flex items-center gap-2 mt-6">
+        <input type="checkbox" name="test_mode" id="test_mode" checked class="rounded border-slate-300">
+        <label for="test_mode" class="text-sm">Test Mode (only send to test addresses below)</label>
+      </div>
+      <div class="md:col-span-2">
+        <label class="block text-xs font-medium text-slate-400 mb-1">Test Addresses (comma separated)</label>
+        <input name="test_addresses" placeholder="ava.chen@example.org, liam.patel@example.org" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <a href="/campaigns" class="px-4 py-2 text-sm text-slate-500">Cancel</a>
+    <button type="submit" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5">Create Campaign (Draft)</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Reports{% endblock %}
+{% block header %}Reports{% endblock %}
+{% block content %}
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 mb-6">
+  <h2 class="font-semibold mb-3 text-sm">Generate Report</h2>
+  <form method="post" action="/reports/generate" class="flex flex-wrap items-end gap-3">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div>
+      <label class="block text-xs font-medium text-slate-400 mb-1">Format</label>
+      <select name="fmt" class="rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <option value="pdf">PDF</option>
+        <option value="csv">CSV</option>
+        <option value="xlsx">Excel</option>
+        <option value="json">JSON</option>
+      </select>
+    </div>
+    <div>
+      <label class="block text-xs font-medium text-slate-400 mb-1">Campaign (optional)</label>
+      <select name="campaign_id" class="rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <option value="">All campaigns (program-wide)</option>
+        {% for c in campaigns %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2">Generate</button>
+  </form>
+</div>
+
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-xs uppercase">
+      <tr><th class="text-left px-4 py-2.5">Generated</th><th class="text-left px-4 py-2.5">Format</th><th class="px-4 py-2.5"></th></tr>
+    </thead>
+    <tbody>
+      {% for r in items %}
+      <tr class="border-t border-slate-100 dark:border-slate-800">
+        <td class="px-4 py-2">{{ r.generated_at|fmt_dt }}</td>
+        <td class="px-4 py-2 uppercase">{{ r.format }}</td>
+        <td class="px-4 py-2 text-right"><a href="/reports/{{ r.id }}/download" class="text-brand-600 hover:underline">Download</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="px-4 py-8 text-center text-slate-400">No reports generated yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

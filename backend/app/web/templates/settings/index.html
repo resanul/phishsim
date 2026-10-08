@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block header %}Settings{% endblock %}
+{% block content %}
+<div class="grid md:grid-cols-2 gap-6 max-w-3xl">
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">Organization</h2>
+    <form method="post" action="/settings/organization" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Organization Name</label>
+        <input name="name" value="{{ org.name }}" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Default Time Zone</label>
+        <input name="timezone" value="{{ org.timezone }}" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <button type="submit" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2">Save</button>
+    </form>
+  </div>
+
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">Privacy &amp; Retention</h2>
+    <form method="post" action="/settings/privacy" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Default Retention (days)</label>
+        <input type="number" name="retention_days" value="{{ privacy.retention_days }}" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-medium text-slate-400 mb-1">Anonymize After (days)</label>
+        <input type="number" name="anonymize_after_days" value="{{ privacy.anonymize_after_days }}" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" name="auto_delete_events" {% if privacy.auto_delete_events %}checked{% endif %} class="rounded border-slate-300">
+        <label class="text-sm">Automatically delete events past retention window (run via <code>manage.py cleanup</code>)</label>
+      </div>
+      <button type="submit" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2">Save</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

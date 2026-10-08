@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}New Landing Page{% endblock %}
+{% block header %}New Landing Page{% endblock %}
+{% block content %}
+<form method="post" action="/landing-pages/new" class="max-w-2xl space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div>
+    <label class="block text-xs font-medium text-slate-400 mb-1">Name</label>
+    <input name="name" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-400 mb-1">HTML Body</label>
+    <p class="text-xs text-slate-400 mb-1">Variables: {{ '{{first_name}} {{last_name}} {{department}} {{job_title}} {{company}} {{campaign_name}}' }}</p>
+    <textarea name="html_body" rows="10" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm font-mono text-xs"></textarea>
+  </div>
+  <div class="flex items-center gap-2">
+    <input type="checkbox" name="has_synthetic_form" id="hsf" class="rounded border-slate-300">
+    <label for="hsf" class="text-sm">Includes a synthetic demo credential form (submitted values are always discarded, never stored)</label>
+  </div>
+  <div class="flex items-center gap-2">
+    <input type="checkbox" name="show_education_reveal" id="ser" checked class="rounded border-slate-300">
+    <label for="ser" class="text-sm">Show the educational "you were phished" reveal</label>
+  </div>
+  <div class="flex justify-end gap-3">
+    <a href="/landing-pages" class="px-4 py-2 text-sm text-slate-500">Cancel</a>
+    <button type="submit" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5">Save Landing Page</button>
+  </div>
+</form>
+{% endblock %}

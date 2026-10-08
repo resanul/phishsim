@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block header %}Security Awareness Dashboard{% endblock %}
+{% block content %}
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+  {% set cards = [
+    ('Total Campaigns', kpis.total_campaigns, 'slate'),
+    ('Active Campaigns', kpis.active_campaigns, 'brand'),
+    ('Emails Sent', kpis.emails_sent, 'slate'),
+    ('Click Rate', kpis.click_rate_pct|fmt_pct, 'amber'),
+    ('Report Rate', kpis.report_rate_pct|fmt_pct, 'emerald'),
+    ('Simulation Completion', kpis.simulation_completion_rate_pct|fmt_pct, 'slate'),
+    ('Delivery Rate', kpis.delivery_rate_pct|fmt_pct, 'slate'),
+    ('Avg. Time to Report (min)', kpis.avg_time_to_report_minutes if kpis.avg_time_to_report_minutes is not none else '—', 'slate'),
+  ] %}
+  {% for label, value, color in cards %}
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4">
+    <p class="text-xs font-medium text-slate-400 uppercase tracking-wide mb-1">{{ label }}</p>
+    <p class="text-2xl font-bold {% if color=='brand' %}text-brand-600{% elif color=='amber' %}text-amber-500{% elif color=='emerald' %}text-emerald-500{% endif %}">{{ value }}</p>
+  </div>
+  {% endfor %}
+</div>
+
+<div class="grid md:grid-cols-2 gap-6">
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4">Employee Participation</h2>
+    <dl class="grid grid-cols-2 gap-4 text-sm">
+      <div><dt class="text-slate-400">Total Participants</dt><dd class="text-lg font-semibold">{{ employees.total_participants }}</dd></div>
+      <div><dt class="text-slate-400">Clicked</dt><dd class="text-lg font-semibold text-amber-500">{{ employees.clicked }}</dd></div>
+      <div><dt class="text-slate-400">Reported</dt><dd class="text-lg font-semibold text-emerald-500">{{ employees.reported }}</dd></div>
+      <div><dt class="text-slate-400">Completed Training</dt><dd class="text-lg font-semibold">{{ employees.completed_training }}</dd></div>
+      <div><dt class="text-slate-400">Repeat Interactions</dt><dd class="text-lg font-semibold text-red-500">{{ employees.repeat_interactions }}</dd></div>
+    </dl>
+  </div>
+
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4">Department Awareness Scores</h2>
+    <table class="w-full text-sm">
+      <thead class="text-slate-400 text-xs uppercase">
+        <tr><th class="text-left py-1">Department</th><th class="text-right py-1">Sent</th><th class="text-right py-1">Click %</th><th class="text-right py-1">Report %</th></tr>
+      </thead>
+      <tbody>
+        {% for row in departments %}
+        <tr class="border-t border-slate-100 dark:border-slate-800">
+          <td class="py-1.5">{{ row.department }}</td>
+          <td class="py-1.5 text-right">{{ row.sent }}</td>
+          <td class="py-1.5 text-right">
+            <div class="flex items-center justify-end gap-2">
+              <div class="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-amber-500" style="width: {{ row.click_rate_pct }}%"></div></div>
+              {{ row.click_rate_pct }}%
+            </div>
+          </td>
+          <td class="py-1.5 text-right">{{ row.report_rate_pct }}%</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="py-4 text-center text-slate-400">No campaign data yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

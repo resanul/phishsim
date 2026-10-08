@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Administration{% endblock %}
+{% block header %}Administration{% endblock %}
+{% block content %}
+<div class="grid md:grid-cols-3 gap-6">
+  <div class="md:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-xs uppercase">
+        <tr><th class="text-left px-4 py-2.5">Name</th><th class="text-left px-4 py-2.5">Email</th><th class="text-left px-4 py-2.5">Role</th><th class="text-left px-4 py-2.5">MFA</th><th class="text-left px-4 py-2.5">Status</th><th class="px-4 py-2.5"></th></tr>
+      </thead>
+      <tbody>
+        {% for a in items %}
+        <tr class="border-t border-slate-100 dark:border-slate-800">
+          <td class="px-4 py-2">{{ a.full_name }}</td>
+          <td class="px-4 py-2 font-mono text-xs">{{ a.email }}</td>
+          <td class="px-4 py-2">{{ a.role.name.replace('_',' ')|title }}</td>
+          <td class="px-4 py-2">{% if a.mfa_enabled %}✓{% else %}—{% endif %}</td>
+          <td class="px-4 py-2">
+            {% if a.is_active %}<span class="badge bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">Active</span>
+            {% else %}<span class="badge bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">Disabled</span>{% endif %}
+          </td>
+          <td class="px-4 py-2 text-right">
+            {% if a.is_active and a.id != current_admin.id %}
+            <form method="post" action="/administration/{{ a.id }}/deactivate" onsubmit="return confirm('Deactivate {{ a.email }}?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="text-red-500 hover:underline text-xs">Deactivate</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">Add Administrator</h2>
+    <form method="post" action="/administration/add" class="space-y-3">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <input name="full_name" placeholder="Full name" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      <input name="email" type="email" placeholder="Email" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      <input name="password" type="password" placeholder="Temporary password" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+      <select name="role_name" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+        <option value="read_only">Read Only</option>
+        <option value="analyst">Analyst</option>
+        <option value="campaign_manager">Campaign Manager</option>
+        <option value="security_administrator">Security Administrator</option>
+        <option value="super_admin">Super Admin</option>
+      </select>
+      <p class="text-xs text-slate-400">Password policy: 12+ chars, upper/lower/digit/symbol.</p>
+      <button type="submit" class="w-full rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-4 py-2">Create</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

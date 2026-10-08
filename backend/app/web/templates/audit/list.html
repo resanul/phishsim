@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Audit Logs{% endblock %}
+{% block header %}Audit Logs{% endblock %}
+{% block content %}
+<div class="mb-4 rounded-lg border px-4 py-3 text-sm {% if chain_ok %}border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300{% else %}border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300{% endif %}">
+  {% if chain_ok %}✓ Audit hash chain intact — no tampering detected.{% else %}⚠ Audit chain integrity check FAILED: {{ chain_message }}{% endif %}
+</div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-400 text-xs uppercase">
+      <tr>
+        <th class="text-left px-4 py-2.5">Timestamp</th>
+        <th class="text-left px-4 py-2.5">Actor</th>
+        <th class="text-left px-4 py-2.5">Action</th>
+        <th class="text-left px-4 py-2.5">Object</th>
+        <th class="text-left px-4 py-2.5">Source IP</th>
+        <th class="text-left px-4 py-2.5">Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in items %}
+      <tr class="border-t border-slate-100 dark:border-slate-800">
+        <td class="px-4 py-2 font-mono text-xs">{{ r.timestamp|fmt_dt }}</td>
+        <td class="px-4 py-2">{{ r.actor_email }}</td>
+        <td class="px-4 py-2 font-mono text-xs">{{ r.action }}</td>
+        <td class="px-4 py-2 text-xs">{{ r.object_type }}{% if r.object_id %}<span class="text-slate-400"> / {{ r.object_id[:8] }}</span>{% endif %}</td>
+        <td class="px-4 py-2 text-xs">{{ r.source_ip or '—' }}</td>
+        <td class="px-4 py-2">
+          <span class="badge {% if r.result == 'success' %}bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300{% else %}bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300{% endif %}">{{ r.result }}</span>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No audit records yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

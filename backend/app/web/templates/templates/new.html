@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}New Template{% endblock %}
+{% block header %}New Email Template{% endblock %}
+{% block content %}
+{% if validation and not validation.is_valid %}
+<div class="mb-4 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 px-4 py-3 text-sm">
+  <p class="font-semibold mb-1">Validation failed:</p>
+  <ul class="list-disc pl-5 space-y-0.5">
+    {% for v in validation.broken_links %}<li>Broken link: {{ v }}</li>{% endfor %}
+    {% for v in validation.unknown_variables %}<li>Unknown variable: {{ '{{' }}{{ v }}{{ '}}' }}</li>{% endfor %}
+    {% for v in validation.html_errors %}<li>HTML issue: {{ v }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+<form method="post" action="/templates/new" class="max-w-2xl space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <div>
+    <label class="block text-xs font-medium text-slate-400 mb-1">Name</label>
+    <input name="name" value="{{ name or '' }}" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <label class="block text-xs font-medium text-slate-400 mb-1">Scenario</label>
+      <input name="scenario" value="{{ scenario or 'custom' }}" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+    </div>
+    <div>
+      <label class="block text-xs font-medium text-slate-400 mb-1">From Name</label>
+      <input name="from_name" value="{{ from_name or '' }}" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+    </div>
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-400 mb-1">Subject</label>
+    <input name="subject" value="{{ subject or '' }}" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm">
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-400 mb-1">HTML Body</label>
+    <p class="text-xs text-slate-400 mb-1">Variables: {{ '{{first_name}} {{last_name}} {{department}} {{job_title}} {{company}} {{campaign_name}} {{simulation_link}}' }}</p>
+    <textarea name="html_body" rows="8" required class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm font-mono text-xs">{{ html_body or '' }}</textarea>
+  </div>
+  <div>
+    <label class="block text-xs font-medium text-slate-400 mb-1">Plain-Text Body (optional)</label>
+    <textarea name="text_body" rows="4" class="w-full rounded-lg border border-slate-200 dark:border-slate-700 dark:bg-slate-800 px-3 py-2 text-sm font-mono text-xs">{{ text_body or '' }}</textarea>
+  </div>
+  <div class="flex justify-end gap-3">
+    <a href="/templates" class="px-4 py-2 text-sm text-slate-500">Cancel</a>
+    <button type="submit" class="rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5">Save Template</button>
+  </div>
+</form>
+{% endblock %}

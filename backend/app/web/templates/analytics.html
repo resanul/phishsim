@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block header %}Analytics{% endblock %}
+{% block content %}
+<div class="grid md:grid-cols-2 gap-6">
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">Program KPIs</h2>
+    <dl class="grid grid-cols-2 gap-4 text-sm">
+      {% for label, value in [('Total Campaigns', kpis.total_campaigns), ('Emails Sent', kpis.emails_sent), ('Delivery Rate', kpis.delivery_rate_pct ~ '%'), ('Click Rate', kpis.click_rate_pct ~ '%'), ('Report Rate', kpis.report_rate_pct ~ '%'), ('Completion Rate', kpis.simulation_completion_rate_pct ~ '%')] %}
+      <div><dt class="text-slate-400">{{ label }}</dt><dd class="text-lg font-semibold">{{ value }}</dd></div>
+      {% endfor %}
+    </dl>
+  </div>
+  <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5">
+    <h2 class="font-semibold mb-4 text-sm text-slate-400 uppercase tracking-wide">Department Comparison</h2>
+    <div class="space-y-3">
+      {% for row in departments %}
+      <div>
+        <div class="flex justify-between text-sm mb-1"><span>{{ row.department }}</span><span class="text-slate-400">{{ row.sent }} sent</span></div>
+        <div class="flex gap-1 h-2">
+          <div class="bg-amber-500 rounded-l-full" style="width: {{ row.click_rate_pct }}%"></div>
+          <div class="bg-emerald-500 rounded-r-full" style="width: {{ row.report_rate_pct }}%"></div>
+        </div>
+        <div class="flex justify-between text-xs text-slate-400 mt-0.5"><span>Click {{ row.click_rate_pct }}%</span><span>Report {{ row.report_rate_pct }}%</span></div>
+      </div>
+      {% else %}
+      <p class="text-slate-400 text-sm">No data yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

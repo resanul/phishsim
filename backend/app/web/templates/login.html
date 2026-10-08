@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign in · PhishSim</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  if (localStorage.getItem('phishsim-theme') === 'dark') { document.documentElement.classList.add('dark'); }
+  tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'] }, colors: { brand: { 600:'#2563eb',700:'#1d4ed8' } } } } }
+</script>
+</head>
+<body class="h-full bg-slate-950 font-sans antialiased flex items-center justify-center">
+  <div class="w-full max-w-sm">
+    <div class="flex items-center gap-2 justify-center mb-8">
+      <div class="w-9 h-9 rounded bg-brand-600 flex items-center justify-center text-white font-bold">PS</div>
+      <span class="text-white font-semibold text-lg tracking-tight">PhishSim</span>
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl">
+      <h1 class="text-white text-lg font-semibold mb-1">Security Team Sign In</h1>
+      <p class="text-slate-400 text-sm mb-6">Authorized administrators only. All access is logged.</p>
+
+      {% if error %}
+      <div class="mb-4 rounded-lg border border-red-900/50 bg-red-950/40 text-red-300 px-3 py-2 text-sm">{{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/login" class="space-y-4">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Email</label>
+          <input type="email" name="email" value="{{ email }}" required autofocus
+                 class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-600">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">Password</label>
+          <input type="password" name="password" required
+                 class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-brand-600">
+        </div>
+        {% if mfa_required %}
+        <div>
+          <label class="block text-xs font-medium text-slate-400 mb-1">MFA Code</label>
+          <input type="text" name="totp_code" inputmode="numeric" maxlength="6" autofocus
+                 class="w-full rounded-lg bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-white tracking-widest focus:outline-none focus:ring-2 focus:ring-brand-600">
+        </div>
+        {% endif %}
+        <button type="submit" class="w-full rounded-lg bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold py-2.5 transition">
+          Sign in
+        </button>
+      </form>
+    </div>
+    <p class="text-center text-slate-500 text-xs mt-6">Simulation platform for authorized internal security-awareness campaigns only.</p>
+  </div>
+</body>
+</html>
